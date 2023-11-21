@@ -1,12 +1,21 @@
 import time
-
+import glob,os
 import cv2
+from send_mail_alert import send_mail
+
 
 video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 time.sleep(1)
 
 first_frame_gau = None
 status_list =[]
+count = 0
+
+def clean_folder():
+    images = glob.glob("images/*.png")
+    for image in images:
+        os.remove(image)
+
 while True:
     status = 0
     check, frame = video.read()
@@ -31,12 +40,18 @@ while True:
         rectangle = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),3)
         if rectangle.any():
             status=1
+            cv2.imwrite(f'images/frame{count}.png',frame)
+            count += 1
+            all_images = glob.glob("images/*.png")
+            index = int(len(all_images)/2)
 
     status_list.append(status)
     status_list = status_list[-2:]
     print(status_list)
-    if status_list[0] ==1 and status_list[1] ==0:
-        print("sent mail")
+    if status_list[0] == 1 and status_list[1] ==0:
+        image_with_object = all_images[index]
+        send_mail(image_with_object)
+        clean_folder()
 
 
     cv2.imshow("processed video",frame)
