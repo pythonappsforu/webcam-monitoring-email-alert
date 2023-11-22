@@ -2,6 +2,7 @@ import time
 import glob,os
 import cv2
 from send_mail_alert import send_mail
+from threading import Thread
 
 
 video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -50,13 +51,24 @@ while True:
     print(status_list)
     if status_list[0] == 1 and status_list[1] ==0:
         image_with_object = all_images[index]
-        send_mail(image_with_object)
-        clean_folder()
+
+        mail_thread = Thread(target=send_mail,args=(image_with_object,))
+        mail_thread.daemon = True
+        mail_thread.start()
+
+        #clean_folder_thread= Thread(target= clean_folder)
+        #clean_folder_thread.daemon =True
+        #clean_folder_thread.start()
+
 
 
     cv2.imshow("processed video",frame)
     key = cv2.waitKey(1)
     if key == ord("q"):
-        exit()
+        break
+
+
+
 
 video.release()
+clean_folder()

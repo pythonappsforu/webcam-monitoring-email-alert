@@ -7,9 +7,9 @@ from email.message import EmailMessage
 
 load_dotenv()
 
-SENDER = "pythonbyfebash@gmail.com"
+SENDER = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
-reciever = "pythonbyfebash@gmail.com"
+reciever = SENDER
 HOST= "smtp.gmail.com"
 PORT = 587
 
